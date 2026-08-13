@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RC Car Track Simulator — Cursor Continuation</title>
+  <link rel="stylesheet" href="css/sim.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="mark">RC</span>
+      <div>
+        <h1>Track Follow Simulator</h1>
+        <p>Desktop test world for the Portenta / FOMO continuation stack</p>
+      </div>
+    </div>
+    <div class="controls">
+      <label>
+        Vision mode
+        <select id="vision-mode">
+          <option value="road" selected>Road centroid (new)</option>
+          <option value="dots">Floor dots / FOMO-style</option>
+        </select>
+      </label>
+      <button id="btn-start" type="button">Start Autonomous Drive</button>
+      <button id="btn-reset" type="button" class="ghost">Reset</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel world-panel">
+      <h2>World (top-down)</h2>
+      <canvas id="world" width="720" height="480"></canvas>
+    </section>
+
+    <section class="panel side">
+      <div>
+        <h2>Fake camera (96×96)</h2>
+        <canvas id="camera" width="240" height="240"></canvas>
+        <p class="hint">Green line = detected target X · Yellow = image center</p>
+      </div>
+      <div class="telemetry">
+        <h2>Control loop (same as firmware)</h2>
+        <dl>
+          <dt>Mode</dt><dd id="mode">road</dd>
+          <dt>Target</dt><dd id="target">—</dd>
+          <dt>Steer</dt><dd id="steer">—</dd>
+          <dt>Throttle</dt><dd id="throttle">—</dd>
+          <dt>Laps</dt><dd id="lap">0</dd>
+        </dl>
+        <p class="formula">
+          <code>P1 = (x + w/2) − 48</code><br />
+          <code>steer = clamp(P1 + 93, 63, 123)</code>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>
+      Mirrors <code>cursor-continuation/firmware_portenta/TrackFollowCar</code>
+      and the original <code>LINEAR_STEERING</code> math from <code>RC-Car-Code/</code>.
+    </p>
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
