@@ -12,16 +12,24 @@
       <span class="mark">RC</span>
       <div>
         <h1>Track Follow Simulator</h1>
-        <p>Desktop test world for the Portenta / FOMO continuation stack</p>
+        <p>Real-world–oriented test harness for Portenta firmware</p>
       </div>
     </div>
     <div class="controls">
       <label>
-        Vision mode
+        Track
+        <select id="track-select"></select>
+      </label>
+      <label>
+        Vision
         <select id="vision-mode">
-          <option value="road" selected>Road centroid (new)</option>
+          <option value="road" selected>Road centroid</option>
           <option value="dots">Floor dots / FOMO-style</option>
         </select>
+      </label>
+      <label class="check">
+        <input type="checkbox" id="realism" checked />
+        Realism (noise / lag / drops)
       </label>
       <button id="btn-start" type="button">Start Autonomous Drive</button>
       <button id="btn-reset" type="button" class="ghost">Reset</button>
@@ -30,28 +38,30 @@
 
   <main class="layout">
     <section class="panel world-panel">
-      <h2>World (top-down)</h2>
+      <h2>World (top-down) — <span id="track-name">Technical</span></h2>
       <canvas id="world" width="720" height="480"></canvas>
     </section>
 
     <section class="panel side">
       <div>
-        <h2>Fake camera (96×96)</h2>
+        <h2>Fake camera (96×96, ~45° look-down)</h2>
         <canvas id="camera" width="240" height="240"></canvas>
-        <p class="hint">Green line = detected target X · Yellow = image center</p>
+        <p class="hint">Green = detected target · Yellow = center · Matches firmware FOMO space</p>
       </div>
       <div class="telemetry">
-        <h2>Control loop (same as firmware)</h2>
+        <h2>Control loop (= firmware PD + slew)</h2>
         <dl>
           <dt>Mode</dt><dd id="mode">road</dd>
           <dt>Target</dt><dd id="target">—</dd>
           <dt>Steer</dt><dd id="steer">—</dd>
           <dt>Throttle</dt><dd id="throttle">—</dd>
           <dt>Laps</dt><dd id="lap">0</dd>
+          <dt>Off-track</dt><dd id="offtrack">0%</dd>
         </dl>
         <p class="formula">
-          <code>P1 = (x + w/2) − 48</code><br />
-          <code>steer = clamp(P1 + 93, 63, 123)</code>
+          <code>err = (x + w/2) − 48</code><br />
+          <code>steer = mid + Kp·err + Kd·Δerr</code><br />
+          <code>throttle ↓ in hard turns · 33&nbsp;ms loop</code>
         </p>
       </div>
     </section>
@@ -59,8 +69,8 @@
 
   <footer>
     <p>
-      Mirrors <code>cursor-continuation/firmware_portenta/TrackFollowCar</code>
-      and the original <code>LINEAR_STEERING</code> math from <code>RC-Car-Code/</code>.
+      Twin of <code>firmware_portenta/TrackFollowCar</code> — PD steering, servo slew,
+      look-ahead road centroid, and Himax-ready capture path for real Arduino Portenta H7.
     </p>
   </footer>
 

@@ -2,12 +2,10 @@
 
 Restart of the Portenta / XIAO FOMO “follow marks on the floor” project, with:
 
-1. **New Arduino firmware** (`firmware_portenta/`) that reuses the original pin map and linear steering math, and can follow either **floor dots/marks** (FOMO-style) or a **road / track centerline**.
-2. **Desktop simulator** (`simulator/`) — a browser test world with a fake track, fake camera, and a virtual car driven by the **same control loop** as the firmware.
+1. **Arduino firmware** (`firmware_portenta/`) — PD steering, servo slew, turn-based throttle cut, road-centroid vision, optional real **Himax HM01B0** capture (`USE_PORTENTA_CAMERA`).
+2. **Desktop simulator** (`simulator/`) — complex tracks (oval, figure-8, technical hairpins, room tape), ~45° look-down camera with noise/lag, same 33&nbsp;ms control loop as the firmware.
 
 ## Quick start (simulator)
-
-From the repo root:
 
 ```bash
 python3 -m http.server 8000
@@ -15,15 +13,24 @@ python3 -m http.server 8000
 
 Open: [http://localhost:8000/cursor-continuation/simulator/](http://localhost:8000/cursor-continuation/simulator/)
 
-Click **Start Autonomous Drive**. The car should follow the track using the simulated camera.
+Pick **Technical hairpins** or **Figure-8**, leave **Realism** on, click **Start Autonomous Drive**.
 
-## Firmware
+Control unit test:
+
+```bash
+node cursor-continuation/simulator/js/control_test.mjs
+```
+
+## Firmware (real Arduino)
 
 Open `firmware_portenta/TrackFollowCar/` in the Arduino IDE (Portenta H7 + Vision Shield).
 
-- Pins match the mature Portenta stack (`D2` servo, `D5` PWM, `D1`/`D3` direction).
-- Set `VISION_MODE` in `config.h` to `VISION_FOMO_DOTS` or `VISION_ROAD_CENTROID`.
-- For FOMO dots, install your Edge Impulse Arduino library and uncomment the include (see `models/README.md`).
+1. In `config.h`, uncomment `#define USE_PORTENTA_CAMERA`.
+2. Keep `VISION_MODE` as `VISION_ROAD_CENTROID` for dark tape / asphalt on a light floor.
+3. Flash; Serial 115200 shows `found / x / conf / err / steer / thr`.
+4. Camera ~45° down (same as the original FOMO training angle).
+
+Pins: `D2` servo, `D5` PWM, `D1`/`D3` direction — unchanged from `RC-Car-Code`.
 
 ## Layout
 
@@ -32,10 +39,8 @@ cursor-continuation/
   README.md
   docs/ARCHITECTURE.md
   models/README.md
-  firmware_portenta/TrackFollowCar/   # Arduino sketch
+  firmware_portenta/TrackFollowCar/   # Arduino sketch (real-world path)
   simulator/                          # browser test environment
 ```
 
-## Relation to old code
-
-Historical firmware lives under `RC-Car-Code/`. This folder is the active place for new work so we do not disturb the archived versions.
+Historical firmware stays under `RC-Car-Code/`.

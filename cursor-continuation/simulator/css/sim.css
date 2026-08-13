@@ -80,6 +80,22 @@ body {
   letter-spacing: 0.06em;
 }
 
+.controls label.check {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.45rem;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.85rem;
+  padding-bottom: 0.45rem;
+  color: var(--ink);
+}
+
+.controls label.check input {
+  width: 1rem;
+  height: 1rem;
+}
+
 select, button {
   font: inherit;
   border-radius: 0.45rem;

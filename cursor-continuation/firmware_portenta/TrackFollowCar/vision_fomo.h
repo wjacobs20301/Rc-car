@@ -32,6 +32,7 @@ inline VisionTarget vision_fomo_from_boxes(
   t.found = false;
   t.x = VISION_CENTER;
   t.w = 0.0f;
+  t.conf = 0.0f;
 
   int best_y = -1;
   for (int i = 0; i < count; i++) {
@@ -43,6 +44,7 @@ inline VisionTarget vision_fomo_from_boxes(
       best_y = ys[i];
       t.x = (float)xs[i];
       t.w = (float)ws[i];
+      t.conf = scores[i];
       t.found = true;
     }
   }
