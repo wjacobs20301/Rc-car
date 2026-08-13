@@ -52,6 +52,7 @@ let lastIndex = 0;
 let framesSeen = 0;
 let framesLost = 0;
 let offTrackFrames = 0;
+let physicsSamples = 0;
 let simTime = 0;
 let controlAcc = 0;
 const CONTROL_DT = 0.033; // ~30 ms — matches Arduino LOOP_DELAY_MS
@@ -88,6 +89,7 @@ function resetCar() {
   framesSeen = 0;
   framesLost = 0;
   offTrackFrames = 0;
+  physicsSamples = 0;
   elLap.textContent = "0";
   elOff.textContent = "0%";
   elTrackName.textContent = world.name;
@@ -185,8 +187,8 @@ function physicsStep(dt) {
   car.actSteer += (car.cmdSteer - car.actSteer) * Math.min(1, dt / steerTau);
   car.actThrottle += (car.cmdThrottle - car.actThrottle) * Math.min(1, dt / thrTau);
 
-  const targetSpeed = car.actThrottle > 0 ? 18 + car.actThrottle * 0.7 : 0;
-  car.speed += (targetSpeed - car.speed) * Math.min(1, dt * 2.5);
+  const targetSpeed = car.actThrottle > 0 ? 12 + car.actThrottle * 0.45 : 0;
+  car.speed += (targetSpeed - car.speed) * Math.min(1, dt * 2.8);
 
   const yaw = steerToYawRate(car.actSteer, car.speed);
   car.heading += yaw * dt;
@@ -196,9 +198,9 @@ function physicsStep(dt) {
   car.x = Math.max(8, Math.min(world.width - 8, car.x));
   car.y = Math.max(8, Math.min(world.height - 8, car.y));
 
+  physicsSamples++;
   if (!world.onRoad(car.x, car.y)) offTrackFrames++;
-  const samples = Math.max(1, Math.floor(simTime / CONTROL_DT));
-  elOff.textContent = `${((offTrackFrames / samples) * 100).toFixed(0)}%`;
+  elOff.textContent = `${((offTrackFrames / Math.max(1, physicsSamples)) * 100).toFixed(0)}%`;
 
   maybeCountLap();
 }

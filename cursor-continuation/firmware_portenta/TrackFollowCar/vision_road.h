@@ -49,7 +49,7 @@ inline VisionTarget vision_road_from_gray(const uint8_t *gray, int w, int h) {
   long count = 0;
 
   for (int y = y0; y < h; y++) {
-    float row_w = 0.6f + 0.8f * ((float)(y - y0) / (float)max(1, h - 1 - y0));
+    float row_w = 0.6f + 0.8f * ((float)(y - y0) / (float)((h - 1 - y0) > 0 ? (h - 1 - y0) : 1));
     const uint8_t *row = gray + y * w;
     for (int x = 0; x < w; x++) {
       if (row[x] < ROAD_DARK_THRESHOLD) {
@@ -80,9 +80,9 @@ inline VisionTarget vision_road_from_gray(const uint8_t *gray, int w, int h) {
   if (conf > 1.0f) conf = 1.0f;
 
   t.x = mean_x * ((float)VISION_WIDTH / (float)w);
-  float width_est = sigma * 1.5f;
-  if (width_est > 40.0f) width_est = 40.0f;
-  t.w = width_est * ((float)VISION_WIDTH / (float)w);
+  // Width is diagnostic only — control treats t.x as center (w must be 0).
+  (void)sigma;
+  t.w = 0.0f;
   t.conf = conf;
   t.found = conf > ROAD_MIN_CONF;
   return t;

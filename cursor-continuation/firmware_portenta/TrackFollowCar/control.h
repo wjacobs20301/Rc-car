@@ -77,7 +77,8 @@ inline void control_update(ControlState *c, const VisionTarget *t) {
   }
 
   c->lost_frames = 0;
-  float err = (t->x + t->w * 0.5f) - VISION_CENTER;
+  // t->x is always the CENTER in FOMO space (road centroid or bbox mid).
+  float err = t->x - VISION_CENTER;
   float deriv = err - c->prev_err;
   c->integral = tf_clampf(c->integral + err * STEER_KI, -STEER_I_LIMIT, STEER_I_LIMIT);
   c->prev_err = err;

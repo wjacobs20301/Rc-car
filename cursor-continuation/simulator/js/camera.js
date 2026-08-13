@@ -203,11 +203,40 @@ export class FakeCamera {
     const sigma = Math.sqrt(varSum / sumW);
     const conf = Math.min(1, count / 400);
 
+    // Reject absurdly wide mass (e.g. figure-8 crossing filling the frame)
+    if (sigma > res * 0.35) {
+      // Fall back to bottom-most rows only
+      return this._centroidBottomHeavy(data, res, darkThresh);
+    }
+
     return {
       found: conf > 0.12,
       x: meanX * (VISION_WIDTH / res),
-      w: Math.min(40, sigma * 1.5) * (VISION_WIDTH / res),
+      w: 0, // x is already center — do not add w/2 in control
       conf,
+    };
+  }
+
+  _centroidBottomHeavy(data, res, darkThresh) {
+    const y0 = Math.floor(res * 0.72);
+    let sumX = 0;
+    let count = 0;
+    for (let y = y0; y < res; y++) {
+      for (let x = 0; x < res; x++) {
+        const i = (y * res + x) * 4;
+        const gray = 0.3 * data[i] + 0.59 * data[i + 1] + 0.11 * data[i + 2];
+        if (gray < darkThresh) {
+          sumX += x;
+          count++;
+        }
+      }
+    }
+    if (count < 20) return { found: false, x: VISION_CENTER, w: 0, conf: 0 };
+    return {
+      found: true,
+      x: (sumX / count) * (VISION_WIDTH / res),
+      w: 0,
+      conf: Math.min(1, count / 200),
     };
   }
 
@@ -239,8 +268,8 @@ export class FakeCamera {
     if (!found || hits < 4) return { found: false, x: VISION_CENTER, w: 0, conf: 0 };
     return {
       found: true,
-      x: bestX * (VISION_WIDTH / res),
-      w: 8 * (VISION_WIDTH / res),
+      x: bestX * (VISION_WIDTH / res), // already a point center
+      w: 0,
       conf: Math.min(1, hits / 40),
     };
   }

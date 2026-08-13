@@ -42,7 +42,8 @@ inline VisionTarget vision_fomo_from_boxes(
     if (labels[i][0] != '1' || labels[i][1] != '\0') continue;
     if (ys[i] > best_y) {
       best_y = ys[i];
-      t.x = (float)xs[i];
+      // Store CENTER (legacy LINEAR_STEERING used x + w/2 externally).
+      t.x = (float)xs[i] + (float)ws[i] * 0.5f;
       t.w = (float)ws[i];
       t.conf = scores[i];
       t.found = true;

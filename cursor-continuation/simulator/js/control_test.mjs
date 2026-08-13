@@ -10,6 +10,7 @@ import {
   HIGH_POINT,
   VISION_CENTER,
   MIN_SPEED,
+  FAST_SPEED,
   SLEW_DEG_PER_FRAME,
 } from "./control.js";
 
@@ -46,7 +47,15 @@ function assert(cond, msg) {
   }
   assert(c.steerDeg > MID_POINT, `expected right, got ${c.steerDeg}`);
   assert(c.steerDeg <= HIGH_POINT, "clamped high");
-  assert(c.throttle < 55, `expected turn throttle cut, got ${c.throttle}`);
+  assert(c.throttle < FAST_SPEED, `expected turn throttle cut, got ${c.throttle}`);
+}
+
+// Road centroid center must NOT add phantom w/2
+{
+  const s = createController();
+  const c = controlUpdate(s, { found: true, x: 32, w: 30 });
+  // err should be 32-48=-16, first frame slew-limited
+  assert(c.p1 === -16, `expected err -16 for centered-x API, got ${c.p1}`);
 }
 
 // Lost target: grace then brake + straighten

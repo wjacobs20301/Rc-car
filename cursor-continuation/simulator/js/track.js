@@ -126,7 +126,7 @@ const TRACK_BUILDERS = {
   }),
   technical: (w, h) => ({
     name: "Technical (hairpins)",
-    roadHalfWidth: 34,
+    roadHalfWidth: 40,
     points: technicalPoints(w / 2, h / 2, w, h),
     dotSpacing: 1,
   }),

@@ -23,9 +23,9 @@
 #define HIGH_POINT  123
 
 ////// Motor speeds (crawl — original car used ~40–45; allow a bit more with PD)
-#define MIN_SPEED   32
-#define SLOW_SPEED  45
-#define FAST_SPEED  55
+#define MIN_SPEED   28
+#define SLOW_SPEED  42
+#define FAST_SPEED  48
 
 ////// FOMO / vision space (Edge Impulse FOMO was 96 wide; 48 = center)
 #define VISION_WIDTH   96
@@ -40,13 +40,13 @@
 #define ROAD_MIN_CONF        0.12f
 
 ////// PD + realism (keep in sync with simulator/js/control.js)
-#define STEER_KP              1.15f
-#define STEER_KD              0.35f
-#define STEER_KI              0.02f
-#define STEER_I_LIMIT         12.0f
-#define SLEW_DEG_PER_FRAME    8
-#define LOST_GRACE_FRAMES     6
-#define HARD_TURN_ERR         18.0f
+#define STEER_KP              1.35f
+#define STEER_KD              0.55f
+#define STEER_KI              0.015f
+#define STEER_I_LIMIT         10.0f
+#define SLEW_DEG_PER_FRAME    10
+#define LOST_GRACE_FRAMES     8
+#define HARD_TURN_ERR         14.0f
 
 #define LOOP_DELAY_MS  33
 

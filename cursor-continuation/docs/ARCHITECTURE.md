@@ -17,7 +17,7 @@ Source of truth for that behavior: `RC-Car-Code/Working-ML-Car-...` and `RC-Car-
 
 | Piece | Role |
 |---|---|
-| Shared PD control | `err = (x+w/2)-48`; `steer = mid + Kp·err + Kd·Δerr (+ light I)`; servo slew; turn-based throttle cut |
+| Shared PD control | `err = x - 48` where `x` is **center** in FOMO space; `steer = mid + Kp·err + Kd·Δerr (+ light I)`; servo slew; turn-based throttle cut |
 | `VISION_ROAD_CENTROID` | Dark-road / tape centroid in lower image band — **runs on real Portenta without EI** |
 | `USE_PORTENTA_CAMERA` | Himax HM01B0 capture → 96×96 downsample → centroid (`portenta_camera.h`) |
 | `VISION_FOMO_DOTS` | Same “follow marks” behavior when EI library is re-exported |

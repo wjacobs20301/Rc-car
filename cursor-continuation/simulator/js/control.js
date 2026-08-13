@@ -11,19 +11,19 @@ export const LOW_POINT = 63;
 export const HIGH_POINT = 123;
 export const VISION_WIDTH = 96;
 export const VISION_CENTER = 48;
-export const SLOW_SPEED = 45;
-export const FAST_SPEED = 55;
-export const MIN_SPEED = 32;
+export const SLOW_SPEED = 42;
+export const FAST_SPEED = 48;
+export const MIN_SPEED = 28;
 export const FOMO_CUTOFF = 0.85;
 
 /** Tunables mirrored in firmware config.h */
-export const KP = 1.15;           // deg per FOMO-pixel of error
-export const KD = 0.35;           // damp overshoot
-export const KI = 0.02;           // slow bias trim
-export const I_LIMIT = 12;
-export const SLEW_DEG_PER_FRAME = 8;
-export const LOST_GRACE_FRAMES = 6;
-export const HARD_TURN_ERR = 18;  // |p1| above this → slow down
+export const KP = 1.35;           // deg per FOMO-pixel of error
+export const KD = 0.55;           // damp overshoot
+export const KI = 0.015;          // slow bias trim
+export const I_LIMIT = 10;
+export const SLEW_DEG_PER_FRAME = 10;
+export const LOST_GRACE_FRAMES = 8;
+export const HARD_TURN_ERR = 14;  // |err| above this → slow down
 
 export function createController() {
   return {
@@ -58,8 +58,8 @@ export function controlUpdate(state, target) {
   }
 
   state.lostFrames = 0;
-  const halfW = (target.w || 0) * 0.5;
-  const err = target.x + halfW - VISION_CENTER; // same as classic P1
+  // target.x is always the CENTER in FOMO space (road centroid or bbox mid).
+  const err = target.x - VISION_CENTER;
   const deriv = err - state.prevErr;
   state.integral = clamp(state.integral + err * KI, -I_LIMIT, I_LIMIT);
   state.prevErr = err;
@@ -107,8 +107,8 @@ function slew(current, target, maxDelta) {
  */
 export function steerToYawRate(steerDeg, speed) {
   const offset = steerDeg - MID_POINT;
-  const maxYaw = 2.35;
-  const speedFactor = Math.min(1, Math.abs(speed) / 40);
-  const understeer = 1 / (1 + Math.abs(speed) / 120);
-  return (offset / 30) * maxYaw * speedFactor * understeer;
+  const maxYaw = 2.8;
+  const speedFactor = Math.min(1, Math.abs(speed) / 28);
+  const understeer = 1 / (1 + Math.abs(speed) / 140);
+  return (offset / 30) * maxYaw * Math.max(0.35, speedFactor) * understeer;
 }
