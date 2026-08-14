@@ -1,28 +1,24 @@
 # Models
 
-The Edge Impulse Arduino libraries used by the original car are **not checked into this repo** (they were installed as Arduino libraries on the build machine).
-
-## Historical FOMO model
-
-Referenced in the working Portenta sketches:
+## Historical FOMO model (your XIAO sketches)
 
 ```text
 ei-3d-print-03-model-45Degree_inferencing.h
 ```
 
-Trained on 3D-printed floor symbols / dots at ~45° camera angle.
+Used by `XIAO_ML_Drive_0.0.2` / `0.0.4` and the older Portenta sketches. Trained on 3D-printed floor marks at ~45° camera angle. **Not checked into this repo** — install as an Arduino library from Edge Impulse.
 
-## How to re-attach a model
+## Road-centroid mode (default on XIAO continuation)
 
-1. Open your Edge Impulse project (or retrain FOMO on your track marks / road features).
-2. Deployment → Arduino library → download `.zip`.
-3. Arduino IDE → Sketch → Include Library → Add .ZIP Library.
-4. In `firmware_portenta/TrackFollowCar/config.h`, set `VISION_MODE` to `VISION_FOMO_DOTS` and uncomment the `#include <your-model_inferencing.h>` line in `TrackFollowCar.ino`.
+`VISION_ROAD_CENTROID` does **not** need Edge Impulse. The XIAO OV2640 captures JPEG → RGB → 96×96 gray → dark-road centroid. Good for high-contrast tape / asphalt on a light floor.
 
-## Road-centroid mode
+## Re-attach FOMO on XIAO
 
-`VISION_ROAD_CENTROID` does **not** need an Edge Impulse model. It thresholds the lower band of a grayscale frame and steers toward the mean X of dark pixels. Useful for high-contrast tape / painted lines / dark track on light floor.
+1. Edge Impulse → Deployment → Arduino library  
+2. Arduino IDE → Include Library → Add .ZIP Library  
+3. In `firmware_xiao/TrackFollowCar/config.h`, set `VISION_MODE` to `VISION_FOMO_DOTS`  
+4. Uncomment the EI `#include` in `TrackFollowCar.ino` and wire `vision_fomo_from_boxes()` after `run_classifier` (same bbox loop as your old `ML_Driving.ino`, but pass **center** `x + w/2`)
 
 ## Simulator
 
-The browser simulator uses procedural vision (no EI weights). Use it to tune steering gain, mid-point, and lost-target braking before flashing hardware.
+Procedural vision only (no EI weights). Use it to tune PD gains before flashing the XIAO.

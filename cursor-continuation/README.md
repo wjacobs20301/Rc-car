@@ -1,9 +1,10 @@
 # Cursor Continuation — Self-Driving RC Car
 
-Restart of the Portenta / XIAO FOMO “follow marks on the floor” project, with:
+**Primary hardware: Seeed XIAO ESP32S3 Sense** (OV2640 camera) — matching your `RC-Car-Code/XIAO_*` sketches.
 
-1. **Arduino firmware** (`firmware_portenta/`) — PD steering, servo slew, turn-based throttle cut, road-centroid vision, optional real **Himax HM01B0** capture (`USE_PORTENTA_CAMERA`).
-2. **Desktop simulator** (`simulator/`) — complex tracks (oval, figure-8, technical hairpins, room tape), ~45° look-down camera with noise/lag, same 33&nbsp;ms control loop as the firmware.
+1. **XIAO firmware** (`firmware_xiao/`) — PD steering, road/tape centroid via `esp_camera`, your pin map (`D0` servo, `D2` PWM, `D1`/`D3` dir).
+2. **Desktop simulator** (`simulator/`) — complex tracks + same control loop for tuning before you flash.
+3. **Portenta** (`firmware_portenta/`) — kept only as a secondary/legacy path from the older Portenta era.
 
 ## Quick start (simulator)
 
@@ -13,34 +14,33 @@ python3 -m http.server 8000
 
 Open: [http://localhost:8000/cursor-continuation/simulator/](http://localhost:8000/cursor-continuation/simulator/)
 
-Pick **Technical hairpins** or **Figure-8**, leave **Realism** on, click **Start Autonomous Drive**.
+## Flash on XIAO ESP32S3 Sense
 
-Control unit test:
+1. Arduino IDE → Board **XIAO_ESP32S3**, **PSRAM Enabled**
+2. Install **ESP32Servo**
+3. Open `firmware_xiao/TrackFollowCar/`
+4. Keep `#define USE_XIAO_CAMERA` and `VISION_ROAD_CENTROID` in `config.h`
+5. Upload; Serial 115200 shows `found / x / conf / err / steer / thr`
+6. Camera ~45° down; dark tape/asphalt on light floor
 
-```bash
-node cursor-continuation/simulator/js/control_test.mjs
-```
+Pins (from your `XIAO_ML_Drive_0.0.4`):
 
-## Firmware (real Arduino)
+| Function | Pin |
+|---|---|
+| Steering servo | `D0` |
+| Motor PWM | `D2` |
+| Forward | `D1` |
+| Reverse | `D3` |
 
-Open `firmware_portenta/TrackFollowCar/` in the Arduino IDE (Portenta H7 + Vision Shield).
-
-1. In `config.h`, uncomment `#define USE_PORTENTA_CAMERA`.
-2. Keep `VISION_MODE` as `VISION_ROAD_CENTROID` for dark tape / asphalt on a light floor.
-3. Flash; Serial 115200 shows `found / x / conf / err / steer / thr`.
-4. Camera ~45° down (same as the original FOMO training angle).
-
-Pins: `D2` servo, `D5` PWM, `D1`/`D3` direction — unchanged from `RC-Car-Code`.
+For FOMO floor-mark mode, re-install `ei-3d-print-03-model-45Degree` and switch `VISION_MODE` — see `models/README.md`.
 
 ## Layout
 
 ```
 cursor-continuation/
-  README.md
+  firmware_xiao/TrackFollowCar/      # ← flash this
+  firmware_portenta/TrackFollowCar/  # legacy / optional
+  simulator/
   docs/ARCHITECTURE.md
   models/README.md
-  firmware_portenta/TrackFollowCar/   # Arduino sketch (real-world path)
-  simulator/                          # browser test environment
 ```
-
-Historical firmware stays under `RC-Car-Code/`.
